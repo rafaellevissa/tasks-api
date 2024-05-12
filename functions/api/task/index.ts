@@ -8,6 +8,8 @@ import updateTask from './update-task';
 
 const app = express();
 
+app.use(express.json());
+
 app.get('/task', listTask);
 app.get('/task/:id', getTask);
 app.post('/task', createTask);

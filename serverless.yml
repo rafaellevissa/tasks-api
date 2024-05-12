@@ -6,12 +6,50 @@ provider:
   runtime: nodejs18.x
 
 plugins:
-  - serverless-dynamodb-local
   - serverless-offline
 
+package:
+  include:
+    - dist/**
+	
 functions:
   api:
     handler: dist/api/task/index.handler
     events:
       - http: ANY /task
       - http: 'ANY /task/{proxy+}'
+
+resources:
+  Resources:
+    TaskTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: tasks-table
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    TaskTablePolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyName: TaskTablePolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'dynamodb:Query'
+                - 'dynamodb:Scan'
+                - 'dynamodb:GetItem'
+                - 'dynamodb:PutItem'
+                - 'dynamodb:UpdateItem'
+                - 'dynamodb:DeleteItem'
+              Resource: !GetAtt TaskTable.Arn
+        Roles:
+          - !Ref "IamRoleLambdaExecution"

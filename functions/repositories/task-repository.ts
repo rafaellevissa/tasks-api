@@ -1,21 +1,17 @@
-import { factoryDb } from "./repository";
+import { create, list } from "./repository";
 
-type Task = {
+export type Task = {
     id?: number;
     title?: string;
     description?: string;
-    createdAt: Date;
 }
 
-export const create = async (tableName: string, payload: Task): Promise<Task> => {
-    const params = {
-        TableName: tableName,
-        Item: payload,
-    };
+const TABLE_NAME = "tasks-table";
 
-    const db = factoryDb();
-    
-    await db.put(params).promise();
-    
-    return payload;
+const createTask = async (payload: Task): Promise<Task> => create(TABLE_NAME, payload);
+const listTask = async (): Promise<Task[]> => list(TABLE_NAME);
+
+export default {
+    createTask,
+    listTask,
 }

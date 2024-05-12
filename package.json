@@ -1,18 +1,20 @@
 {
   "scripts": {
     "build": "tsc",
-    "deploy": "sls deploy",
+    "deploy": "npm run build && sls deploy",
     "start": "npm run build && sls offline start"
   },
   "devDependencies": {
     "@types/node": "^20.12.11",
-    "serverless-dynamodb-local": "^0.2.40",
-    "serverless-offline": "^13.5.0"
+    "serverless-layers": "^2.8.5",
+    "serverless-offline": "^13.5.0",
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "@types/express": "^4.17.21",
+    "aws-sdk": "^2.1618.0",
     "express": "^4.19.2",
     "serverless-http": "^3.2.0",
-    "typescript": "^5.4.5"
+    "yup": "^1.4.0"
   }
 }
