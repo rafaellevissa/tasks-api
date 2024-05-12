@@ -36,3 +36,18 @@ export const list = async (tableName: string): Promise<any[]> => {
 
     return result.Items || [];
 };
+
+export const findById = async (tableName: string, id: string): Promise<any> => {
+    const params = {
+        TableName: tableName,
+        Key: {
+            id: id,
+        },
+    };
+
+    const db = factoryDb();
+
+    const result = await db.get(params).promise();
+
+    return result.Item;
+};
