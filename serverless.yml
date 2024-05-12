@@ -1,0 +1,17 @@
+service: todo
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+functions:
+  api:
+    handler: dist/api/task/index.handler
+    events:
+      - http: ANY /task
+      - http: 'ANY /task/{proxy+}'
