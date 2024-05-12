@@ -1,6 +1,4 @@
-import { DynamoDB } from 'aws-sdk';
-
-const dynamoDb = new DynamoDB.DocumentClient();
+import { factoryDb } from "./repository";
 
 type Task = {
     id?: number;
@@ -14,8 +12,10 @@ export const create = async (tableName: string, payload: Task): Promise<Task> =>
         TableName: tableName,
         Item: payload,
     };
+
+    const db = factoryDb();
     
-    await dynamoDb.put(params).promise();
+    await db.put(params).promise();
     
     return payload;
 }
