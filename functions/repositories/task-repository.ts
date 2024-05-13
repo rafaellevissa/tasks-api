@@ -1,4 +1,4 @@
-import { create, findById, list, update } from "./repository";
+import { create, deleteById, findById, list, update } from "./repository";
 
 export enum TaskStatus {
     PENDING = "pending",
@@ -18,7 +18,7 @@ const createTask = async (payload: Task): Promise<Task> => create(TABLE_NAME, pa
 const listTask = async (): Promise<Task[]> => list(TABLE_NAME);
 const findTask = async (id: string): Promise<Task> => findById(TABLE_NAME, id);
 const updateTask = async (id: string, payload: Task): Promise<Task> => {
-    const allowFields =["title", "description"];
+    const allowFields =["title", "description", "status"];
 
     return update(
         TABLE_NAME,
@@ -27,10 +27,13 @@ const updateTask = async (id: string, payload: Task): Promise<Task> => {
         payload,
     );
 }
+const deleteTask = async (id: string): Promise<void> => deleteById(TABLE_NAME, id);
+
 
 export default {
     createTask,
     listTask,
     findTask,
     updateTask,
+    deleteTask,
 }

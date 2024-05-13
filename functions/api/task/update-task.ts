@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import taskRepository, { Task } from '../../repositories/task-repository';
+import taskRepository, { Task, TaskStatus } from '../../repositories/task-repository';
 import * as yup from 'yup';
+import { pushMessage } from '../../services';
 
 const taskSchema = yup.object().shape({
     title: yup.string().optional(),
     description: yup.string().optional(),
-    status: yup.bool().optional(),
+    status: yup.mixed().oneOf(Object.values(TaskStatus)).optional(),
 });
 
 async function updateTask({ params, body }: Request, res: Response) {
@@ -21,10 +22,10 @@ async function updateTask({ params, body }: Request, res: Response) {
         const tasks = await taskRepository.updateTask(params.id, payload);
     
         if (body?.status) {
-            // publish to email queue
+            await pushMessage({ message: `Task '${params.id}' is done.`, to: process.env.AWS_SQS_EMAIL_NOTIFICATION });
         }
 
-        return res.status(201).json(tasks);
+        return res.status(200).json(tasks);
     } catch (e) {
         return res.status(500).json((e as Error).message);
     }

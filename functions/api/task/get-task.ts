@@ -5,7 +5,7 @@ async function getTask({ params }: Request, res: Response) {
     try {
         const task = await taskRepository.findTask(params.id);
     
-        return res.status(201).json(task);
+        return res.status(200).json(task);
     } catch (e) {
         return res.status(500).json((e as Error).message);
     }

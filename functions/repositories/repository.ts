@@ -58,20 +58,6 @@ export const findById = async (tableName: string, id: string): Promise<any> => {
     return result.Item;
 };
 
-const mapToDynamoDBTypes = (value: any): DynamoDB.AttributeValue => {
-    if (typeof value === 'string') {
-        return { S: value };
-    } else if (typeof value === 'number') {
-        return { N: value.toString() };
-    } else if (typeof value === 'boolean') {
-        return { BOOL: value };
-    } else if (value === null || value === undefined) {
-        return { NULL: true };
-    } else {
-        return { S: value.toString() };
-    }
-};
-
 const buildUpdateExpression = (allowFields: string[], payload: Record<string, any>): ExpressionResult => {
     const updateExpressionParts: string[] = [];
     const expressionAttributeValues: Record<string, any> = {};
@@ -81,7 +67,7 @@ const buildUpdateExpression = (allowFields: string[], payload: Record<string, an
         if (Object.hasOwnProperty.call(payload, key) && allowFields.includes(key)) {
             updateExpressionParts.push(`#${key} = :${key}`);
             expressionAttributeNames[`#${key}`] = key;
-            expressionAttributeValues[`:${key}`] = mapToDynamoDBTypes(payload[key]);
+            expressionAttributeValues[`:${key}`] = payload[key];
         }
     }
 
@@ -111,4 +97,16 @@ export const update = async (tableName: string, id: string, allowFields: string[
     const result = await db.update(params).promise();
 
     return result.Attributes;
+};
+
+export const deleteById = async (tableName: string, id: string): Promise<void> => {
+    const params = {
+        TableName: tableName,
+        Key: {
+            id: id,
+        },
+    };
+    const db = factoryDb();
+
+    await db.delete(params).promise();
 };

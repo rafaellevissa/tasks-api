@@ -15,12 +15,41 @@ package:
 functions:
   api:
     handler: dist/api/task/index.handler
+    environment:
+      AWS_SQS_QUEUE_URL: !GetAtt EmailQueue.QueueUrl
+      AWS_SQS_EMAIL_NOTIFICATION: rafaellevissa@gmail.com # change here where you should receive the email once the task is done
+
     events:
       - http: ANY /task
       - http: 'ANY /task/{proxy+}'
 
+  emailWorker:
+    handler: dist/worker/email-worker.handler
+    events:
+      - sqs:
+          arn: !GetAtt EmailQueue.Arn
+
 resources:
   Resources:
+    EmailQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: email-queue
+
+    LambdaEmailSQSPolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyName: LambdaSQSPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'sqs:SendMessage'
+              Resource: !GetAtt EmailQueue.Arn
+        Roles:
+          - !Ref "IamRoleLambdaExecution"
+
     TaskTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -53,3 +82,4 @@ resources:
               Resource: !GetAtt TaskTable.Arn
         Roles:
           - !Ref "IamRoleLambdaExecution"
+

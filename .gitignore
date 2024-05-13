@@ -4,3 +4,4 @@ jspm_packages
 dist/
 .dynamodb
 custom_layers
+.env
