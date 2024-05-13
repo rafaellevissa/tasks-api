@@ -31,6 +31,20 @@ functions:
 
 resources:
   Resources:
+    SESLambdaPolicy:
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyName: SESLambdaPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'ses:SendEmail'
+              Resource: '*'
+        Roles:
+          - !Ref "IamRoleLambdaExecution"
+
     EmailQueue:
       Type: AWS::SQS::Queue
       Properties:

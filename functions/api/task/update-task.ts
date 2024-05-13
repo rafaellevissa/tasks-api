@@ -21,8 +21,13 @@ async function updateTask({ params, body }: Request, res: Response) {
     try {
         const tasks = await taskRepository.updateTask(params.id, payload);
     
-        if (body?.status) {
-            await pushMessage({ message: `Task '${params.id}' is done.`, to: process.env.AWS_SQS_EMAIL_NOTIFICATION });
+        if (tasks?.status === TaskStatus.DONE) {
+            await pushMessage({
+                message: `Task '${params.id}' is done.`,
+                to: process.env.AWS_SQS_EMAIL_NOTIFICATION,
+                from: process.env.AWS_SQS_EMAIL_NOTIFICATION,
+                subject: "Task notification"
+            });
         }
 
         return res.status(200).json(tasks);
